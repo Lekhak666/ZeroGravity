@@ -1,6 +1,6 @@
-const { createCommit } = require("../utils/crypto");
-const { contract } = require("../config/provider");
-const { addToPool } = require("./pool.service");
+import { createCommit } from "../utils/crypto";
+import { contract } from "../config/provider";
+import { addToPool } from "./pool.service";
 
 async function commitTransaction(txData, userAddress) {
   const { hash, salt } = createCommit(txData);
@@ -23,4 +23,4 @@ async function commitTransaction(txData, userAddress) {
   return hash;
 }
 
-module.exports = { commitTransaction };
+export default { commitTransaction };
