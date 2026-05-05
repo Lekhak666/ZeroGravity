@@ -1,7 +1,7 @@
-import { relayerWallet } from "../config/provider";
+import { relayerWallet } from "../config/provider.js";
 import { ethers } from "ethers";
 
-async function executeTransaction(txData) {
+export async function executeTransaction(txData) {
   const tx = {
     to: txData.to,
     value: ethers.parseEther(txData.amount),
@@ -10,5 +10,3 @@ async function executeTransaction(txData) {
   const response = await relayerWallet.sendTransaction(tx);
   return response.hash;
 }
-
-export default { executeTransaction };

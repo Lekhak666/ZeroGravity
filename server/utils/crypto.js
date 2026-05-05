@@ -1,6 +1,6 @@
 import { randomBytes, createHash } from "crypto";
 
-function createCommit(txData) {
+export function createCommit(txData) {
   const salt = randomBytes(16).toString("hex");
 
   const hash = createHash("sha256")
@@ -9,5 +9,3 @@ function createCommit(txData) {
 
   return { hash, salt };
 }
-
-export default { createCommit };

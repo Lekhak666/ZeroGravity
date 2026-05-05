@@ -1,21 +1,17 @@
 import { ethers } from "ethers";
-require("dotenv").config();
+import dotenv from "dotenv";
 
-const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
+dotenv.config();
 
-const relayerWallet = new ethers.Wallet(
+export const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
+
+export const relayerWallet = new ethers.Wallet(
   process.env.RELAYER_PRIVATE_KEY,
   provider,
 );
 
-const contract = new ethers.Contract(
+export const contract = new ethers.Contract(
   process.env.CONTRACT_ADDRESS,
-  require("./abi.json"), // paste ABI here
+  //   require("./abi.json"), // paste ABI here
   relayerWallet,
 );
-
-export default {
-  provider,
-  relayerWallet,
-  contract,
-};

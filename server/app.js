@@ -1,7 +1,7 @@
 import express, { json } from "express";
 import cors from "cors";
 
-import txRoutes from "./routes/tx.routes";
+import txRoutes from "./routes/tx.routes.js";
 
 const app = express();
 

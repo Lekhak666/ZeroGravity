@@ -1,8 +1,8 @@
-import { createCommit } from "../utils/crypto";
-import { contract } from "../config/provider";
-import { addToPool } from "./pool.service";
+import { createCommit } from "../utils/crypto.js";
+import { contract } from "../config/provider.js";
+import { addToPool } from "./pool.service.js";
 
-async function commitTransaction(txData, userAddress) {
+export async function commitTransaction(txData, userAddress) {
   const { hash, salt } = createCommit(txData);
 
   // on-chain commit
@@ -22,5 +22,3 @@ async function commitTransaction(txData, userAddress) {
 
   return hash;
 }
-
-export default { commitTransaction };

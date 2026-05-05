@@ -1,24 +1,18 @@
-import { revealAndExecute } from "./reveal.service";
+import { revealAndExecute } from "./reveal.service.js";
 
 const pool = [];
 
-function addToPool(tx) {
+export function addToPool(tx) {
   pool.push(tx);
 }
 
-function getPool() {
+export function getPool() {
   return pool;
 }
 
-function findTx(hash) {
+export function findTx(hash) {
   return pool.find((tx) => tx.hash === hash);
 }
-
-export default {
-  addToPool,
-  getPool,
-  findTx,
-};
 
 const DELAY = 15000;
 

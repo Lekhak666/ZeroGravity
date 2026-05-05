@@ -1,7 +1,7 @@
-import { commitTransaction } from "../services/commit.service";
-import { getPool, findTx } from "../services/pool.service";
+import { commitTransaction } from "../services/commit.service.js";
+import { getPool, findTx } from "../services/pool.service.js";
 
-async function commitTx(req, res) {
+export async function commitTx(req, res) {
   try {
     const { to, amount, userAddress } = req.body;
 
@@ -16,11 +16,11 @@ async function commitTx(req, res) {
   }
 }
 
-function getAllTx(req, res) {
+export function getAllTx(req, res) {
   res.json(getPool());
 }
 
-function getTx(req, res) {
+export function getTx(req, res) {
   const tx = findTx(req.params.hash);
 
   if (!tx) {
@@ -29,9 +29,3 @@ function getTx(req, res) {
 
   res.json(tx);
 }
-
-export default {
-  commitTx,
-  getAllTx,
-  getTx,
-};

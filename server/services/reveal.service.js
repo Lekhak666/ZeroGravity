@@ -1,7 +1,7 @@
-import { contract } from "../config/provider";
-import { executeTransaction } from "./execution.service";
+import { contract } from "../config/provider.js";
+import { executeTransaction } from "./execution.service.js";
 
-async function revealAndExecute(tx) {
+export async function revealAndExecute(tx) {
   try {
     const txHash = await executeTransaction(tx.txData);
 
@@ -15,5 +15,3 @@ async function revealAndExecute(tx) {
     tx.error = err.message;
   }
 }
-
-export default { revealAndExecute };
