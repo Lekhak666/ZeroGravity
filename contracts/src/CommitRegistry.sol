@@ -2,6 +2,12 @@
 pragma solidity ^0.8.20;
 
 contract CommitRegistry {
+    
+    error AlreadyCommitted();
+    error NotOwner();
+    error AlreadyRevealed();
+    error UnknownCommit();
+
     struct Commit {
         address user;
         uint256 timestamp;
@@ -20,11 +26,6 @@ contract CommitRegistry {
         address indexed user,
         uint256 ts
     );
-
-    error AlreadyCommitted();
-    error NotOwner();
-    error AlreadyRevealed();
-    error UnknownCommit();
 
     function commit(bytes32 commitHash) external {
         if (commits[commitHash].timestamp != 0) revert AlreadyCommitted();
