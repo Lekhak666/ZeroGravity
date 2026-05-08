@@ -3,12 +3,15 @@ import cors from "cors";
 
 import txRoutes from "./routes/tx.routes.js";
 
+import agentRoutes from "./routes/agent.routes.js";
+
 const app = express();
 
 app.use(cors());
 app.use(json());
 
 app.use("/api/tx", txRoutes);
+app.use("/api/agent", agentRoutes);
 
 const PORT = 5000;
 
