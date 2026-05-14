@@ -3,8 +3,9 @@ pragma solidity ^0.8.20;
 
 /**
  * @title CommitRegistry - A simple commit-reveal registry for off-chain commitments.
- * @author Khushi Barnwal
- * @notice
+ * @author Khushi Barnwal and Nayab Khan
+ * @notice This contract allows users to commit to a hash and later reveal the preimage after a minimum delay. It is designed for use in scenarios where off-chain commitments are needed, such as in a commit-reveal scheme for transactions or actions.
+ * @dev The contract stores commitments in a mapping and enforces rules around committing and revealing.
  */
 contract CommitRegistry {
     error CommitRegistry__AlreadyCommitted();
@@ -20,7 +21,7 @@ contract CommitRegistry {
         address user; // who committed
         bytes32 commitHash; // the hash they submitted
         uint256 timestamp; // when they committed
-        bool revealed; // has it been revealed yet?
+        bool revealed; // has it been revealed yet? // YES or NO?
     }
 
     mapping(bytes32 commitHash => Commitment) public commitments;
