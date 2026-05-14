@@ -1,14 +1,19 @@
+"use client";
+
 import { ethers } from "ethers";
+import artifact from "./CommitRegistry.json";
+import type { WalletClient } from "viem";
 
-export const getProvider = () => {
-  if (typeof window !== "undefined" && (window as any).ethereum) {
-    return new ethers.BrowserProvider((window as any).ethereum);
+const CONTRACT_ADDRESS = "0xB8101132fa8a75d996476327EF56F5e5d7be40A0";
+
+export async function getContract(walletClient: WalletClient) {
+  if (!walletClient.account) {
+    throw new Error("Wallet account not found");
   }
-  throw new Error("MetaMask not found");
-};
 
-export const connectWallet = async () => {
-  const provider = getProvider();
-  const accounts = await provider.send("eth_requestAccounts", []);
-  return accounts[0];
-};
+  const provider = new ethers.BrowserProvider(walletClient.transport);
+
+  const signer = await provider.getSigner(walletClient.account.address);
+
+  return new ethers.Contract(CONTRACT_ADDRESS, artifact.abi, signer);
+}
