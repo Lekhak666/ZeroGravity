@@ -9,7 +9,7 @@ export default function RevealButton() {
     const commitKey = keys.find((k) => k.startsWith("0x"));
 
     if (!commitKey) {
-      alert("No commit found");
+      alert("No such commit found");
       return;
     }
 
@@ -26,7 +26,7 @@ export default function RevealButton() {
       alert(`Revealed: ${txHash}`);
     } catch (err) {
       console.error(err);
-      alert("Reveal failed (too early?)");
+      alert("Reveal failed (was it too early?)");
     }
   }
 

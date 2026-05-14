@@ -9,7 +9,7 @@ const RPC_URL = process.env.RPC_URL;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
 if (!PRIVATE_KEY) {
-  throw new Error("Missing PRIVATE_KEY in .env");
+  throw new Error("Missing PRIVATE_KEY in .env file");
 }
 
 if (!PRIVATE_KEY.startsWith("0x")) {
