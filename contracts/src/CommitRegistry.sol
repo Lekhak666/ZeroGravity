@@ -75,10 +75,6 @@ contract CommitRegistry {
             revert CommitRegistry__RevealTooEarly();
         }
 
-        if (computedHash != c.commitHash) {
-            revert CommitRegistry__InvalidReveal();
-        }
-
         c.revealed = true;
 
         emit Revealed(computedHash, c.user);
