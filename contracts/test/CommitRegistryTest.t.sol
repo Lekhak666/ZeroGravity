@@ -17,11 +17,7 @@ contract CommitRegistryTest is Test {
 
     bytes32 commitHash;
 
-    event Committed(
-        bytes32 indexed commitHash,
-        address indexed user,
-        uint256 timestamp
-    );
+    event Committed(bytes32 indexed commitHash, address indexed user, uint256 timestamp);
 
     event Revealed(bytes32 indexed commitHash, address indexed user);
 
@@ -39,12 +35,7 @@ contract CommitRegistryTest is Test {
         vm.prank(alice);
         registry.commit(commitHash);
 
-        (
-            address user,
-            bytes32 storedHash,
-            uint256 timestamp,
-            bool revealed
-        ) = registry.commitments(commitHash);
+        (address user, bytes32 storedHash, uint256 timestamp, bool revealed) = registry.commitments(commitHash);
 
         assertEq(user, alice);
         assertEq(storedHash, commitHash);
@@ -68,9 +59,7 @@ contract CommitRegistryTest is Test {
 
         vm.prank(alice);
 
-        vm.expectRevert(
-            CommitRegistry.CommitRegistry__AlreadyCommitted.selector
-        );
+        vm.expectRevert(CommitRegistry.CommitRegistry__AlreadyCommitted.selector);
 
         registry.commit(commitHash);
     }
@@ -89,7 +78,7 @@ contract CommitRegistryTest is Test {
 
         registry.reveal(to, amount, nonce, salt);
 
-        (, , , bool revealed) = registry.commitments(commitHash);
+        (,,, bool revealed) = registry.commitments(commitHash);
 
         assertTrue(revealed);
     }
@@ -154,9 +143,7 @@ contract CommitRegistryTest is Test {
 
         vm.prank(alice);
 
-        vm.expectRevert(
-            CommitRegistry.CommitRegistry__AlreadyRevealed.selector
-        );
+        vm.expectRevert(CommitRegistry.CommitRegistry__AlreadyRevealed.selector);
 
         registry.reveal(to, amount, nonce, salt);
     }
@@ -165,13 +152,7 @@ contract CommitRegistryTest is Test {
                                FUZZ TESTS
     //////////////////////////////////////////////////////////////*/
 
-    function testFuzzCommitAndReveal(
-        address user,
-        address _to,
-        uint256 _amount,
-        uint256 _nonce,
-        bytes32 _salt
-    ) public {
+    function testFuzzCommitAndReveal(address user, address _to, uint256 _amount, uint256 _nonce, bytes32 _salt) public {
         vm.assume(user != address(0));
 
         bytes32 hash = keccak256(abi.encode(_to, _amount, _nonce, _salt));
@@ -185,7 +166,7 @@ contract CommitRegistryTest is Test {
 
         registry.reveal(_to, _amount, _nonce, _salt);
 
-        (, , , bool revealed) = registry.commitments(hash);
+        (,,, bool revealed) = registry.commitments(hash);
 
         assertTrue(revealed);
     }
