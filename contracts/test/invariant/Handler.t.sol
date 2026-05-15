@@ -12,12 +12,7 @@ contract Handler {
         registry = _registry;
     }
 
-    function commit(
-        address to,
-        uint256 amount,
-        uint256 nonce,
-        bytes32 salt
-    ) public {
+    function commit(address to, uint256 amount, uint256 nonce, bytes32 salt) public {
         bytes32 hash = keccak256(abi.encode(to, amount, nonce, salt));
 
         try registry.commit(hash) {
@@ -25,13 +20,7 @@ contract Handler {
         } catch {}
     }
 
-    function reveal(
-        uint256 index,
-        address to,
-        uint256 amount,
-        uint256 nonce,
-        bytes32 salt
-    ) public {
+    function reveal(uint256 index, address to, uint256 amount, uint256 nonce, bytes32 salt) public {
         if (hashes.length == 0) return;
 
         index = index % hashes.length;
@@ -46,16 +35,7 @@ contract Handler {
         uint256 ts = block.timestamp + 20 seconds;
 
         assembly {
-            pop(
-                staticcall(
-                    gas(),
-                    0x7109709ECfa91a80626fF3989D68f67F5b1DD12D,
-                    add(ts, 0x20),
-                    0x20,
-                    0,
-                    0
-                )
-            )
+            pop(staticcall(gas(), 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D, add(ts, 0x20), 0x20, 0, 0))
         }
     }
 }

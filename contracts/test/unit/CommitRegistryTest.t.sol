@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {Test} from "forge-std/Test.sol";
-import {CommitRegistry} from "../src/CommitRegistry.sol";
+import {CommitRegistry} from "../../src/CommitRegistry.sol";
 
 contract CommitRegistryTest is Test {
     CommitRegistry registry;
@@ -17,16 +17,16 @@ contract CommitRegistryTest is Test {
 
     bytes32 commitHash;
 
-    event Committed(
-        bytes32 indexed commitHash,
-        address indexed user,
-        uint256 timestamp
-    );
+    event Committed(bytes32 indexed commitHash, address indexed user, uint256 timestamp);
 
     event Revealed(bytes32 indexed commitHash, address indexed user);
 
     function setUp() public {
         registry = new CommitRegistry();
+
+        vm.deal(address(registry), 10 ether);
+
+        vm.deal(alice, 10 ether);
 
         commitHash = keccak256(abi.encode(to, amount, nonce, salt));
     }
@@ -39,17 +39,21 @@ contract CommitRegistryTest is Test {
         vm.prank(alice);
         registry.commit(commitHash);
 
-        (
-            address user,
-            bytes32 storedHash,
-            uint256 timestamp,
-            bool revealed
-        ) = registry.commitments(commitHash);
+        (address user, bytes32 storedHash, uint256 timestamp, bool revealed) = registry.commitments(commitHash);
 
         assertEq(user, alice);
         assertEq(storedHash, commitHash);
         assertEq(timestamp, block.timestamp);
         assertEq(revealed, false);
+    }
+
+    function testDuplicateCommitReverts() public {
+        vm.prank(alice);
+        registry.commit(commitHash);
+
+        vm.prank(alice);
+        vm.expectRevert(CommitRegistry.CommitRegistry__AlreadyCommitted.selector);
+        registry.commit(commitHash);
     }
 
     function testCommitEmitsEvent() public {
@@ -68,11 +72,31 @@ contract CommitRegistryTest is Test {
 
         vm.prank(alice);
 
-        vm.expectRevert(
-            CommitRegistry.CommitRegistry__AlreadyCommitted.selector
-        );
+        vm.expectRevert(CommitRegistry.CommitRegistry__AlreadyCommitted.selector);
 
         registry.commit(commitHash);
+    }
+
+    function testCannotSendEthWithCommit() public {
+        vm.prank(alice);
+
+        vm.expectRevert(CommitRegistry.CommitRegistry__SendEth.selector);
+
+        registry.commit{value: 1 ether}(commitHash);
+    }
+
+    function testRevealTooEarlyReverts() public {
+        assertEq(to, address(99));
+
+        vm.startPrank(alice);
+
+        registry.commit(keccak256(abi.encode(to, amount, nonce, salt)));
+
+        vm.expectRevert(CommitRegistry.CommitRegistry__RevealTooEarly.selector);
+
+        registry.reveal(to, amount, nonce, salt);
+
+        vm.stopPrank();
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -89,7 +113,7 @@ contract CommitRegistryTest is Test {
 
         registry.reveal(to, amount, nonce, salt);
 
-        (, , , bool revealed) = registry.commitments(commitHash);
+        (,,, bool revealed) = registry.commitments(commitHash);
 
         assertTrue(revealed);
     }
@@ -154,9 +178,7 @@ contract CommitRegistryTest is Test {
 
         vm.prank(alice);
 
-        vm.expectRevert(
-            CommitRegistry.CommitRegistry__AlreadyRevealed.selector
-        );
+        vm.expectRevert(CommitRegistry.CommitRegistry__AlreadyRevealed.selector);
 
         registry.reveal(to, amount, nonce, salt);
     }
@@ -165,14 +187,15 @@ contract CommitRegistryTest is Test {
                                FUZZ TESTS
     //////////////////////////////////////////////////////////////*/
 
-    function testFuzzCommitAndReveal(
-        address user,
-        address _to,
-        uint256 _amount,
-        uint256 _nonce,
-        bytes32 _salt
-    ) public {
+    function testFuzzCommitAndReveal(address user, address _to, uint256 _amount, uint256 _nonce, bytes32 _salt) public {
         vm.assume(user != address(0));
+
+        // avoid zero + precompile/system addresses
+        vm.assume(uint160(_to) > 20);
+
+        _amount = bound(_amount, 0, 10 ether);
+
+        vm.deal(address(registry), 10 ether);
 
         bytes32 hash = keccak256(abi.encode(_to, _amount, _nonce, _salt));
 
@@ -182,10 +205,9 @@ contract CommitRegistryTest is Test {
         vm.warp(block.timestamp + 16 seconds);
 
         vm.prank(user);
-
         registry.reveal(_to, _amount, _nonce, _salt);
 
-        (, , , bool revealed) = registry.commitments(hash);
+        (,,, bool revealed) = registry.commitments(hash);
 
         assertTrue(revealed);
     }
