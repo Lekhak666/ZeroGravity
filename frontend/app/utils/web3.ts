@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import artifact from "./CommitRegistry.json";
 import type { WalletClient } from "viem";
 
-const CONTRACT_ADDRESS = "0xa09Ed01DD3e29e431301a4CA327411C268344C79";
+const CONTRACT_ADDRESS = "0x1a668bb4746fe78e104aa0e1f033fa8c9b944320";
 
 export async function getContract(walletClient: WalletClient) {
   if (!walletClient.account) {
