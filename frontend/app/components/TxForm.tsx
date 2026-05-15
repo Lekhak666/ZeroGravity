@@ -48,13 +48,15 @@ export default function TxForm() {
       // SELF CUSTODY
       // -------------------------
       if (mode === "self") {
-        const { commitHash, nonce, salt } = generateCommitment(to, amount);
+        const amountWei = ethers.parseEther(amount);
+
+        const { commitHash, nonce, salt } = generateCommitment(to, amountWei);
 
         localStorage.setItem(
           commitHash,
           JSON.stringify({
             to,
-            amount,
+            amount: amountWei.toString(),
             nonce,
             salt,
           }),
@@ -62,13 +64,13 @@ export default function TxForm() {
 
         localStorage.setItem("latestCommit", commitHash);
 
-        const tx = await contract.commit(commitHash);
+        const tx = await contract.commit(commitHash, {
+          value: amountWei,
+        });
 
         await tx.wait();
 
-        await axios.post("http://localhost:5000/self/commit", {
-          commitHash,
-        });
+        await axios.post("http://localhost:5000/self/commit", { commitHash });
 
         alert("Self-custody commit sent");
       }
@@ -78,7 +80,7 @@ export default function TxForm() {
       // -------------------------
       if (mode === "managed") {
         const res = await axios.post("http://localhost:5000/api/agent/chat", {
-          prompt: `commit ${amount} to ${to}`,
+          prompt: `Privately commit ${amount} ETH to ${to}`,
         });
 
         localStorage.setItem("managedCommit", res.data.commitHash);
@@ -131,36 +133,39 @@ export default function TxForm() {
 
       {/* recipient */}
       <input
+        type="text"
         value={to}
         onChange={(e) => setTo(e.target.value)}
         placeholder="Recipient Address"
         className="
-          w-full
-          p-3
-          rounded-xl
-          bg-zinc-900
-          border
-          border-zinc-700
-          focus:outline-none
-          focus:border-violet-500
-        "
+    w-full
+    p-3
+    rounded-xl
+    bg-zinc-900
+    border
+    border-zinc-700
+    focus:outline-none
+    focus:border-violet-500
+  "
       />
 
       {/* amount */}
       <input
+        type="number"
+        step="0.0001"
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
-        placeholder="Amount"
+        placeholder="Amount (ETH)"
         className="
-          w-full
-          p-3
-          rounded-xl
-          bg-zinc-900
-          border
-          border-zinc-700
-          focus:outline-none
-          focus:border-violet-500
-        "
+    w-full
+    p-3
+    rounded-xl
+    bg-zinc-900
+    border
+    border-zinc-700
+    focus:outline-none
+    focus:border-violet-500
+  "
       />
 
       {/* submit */}
