@@ -5,24 +5,26 @@ import axios from "axios";
 
 export default function TxStatus() {
   const [loading, setLoading] = useState(true);
+
   const [txs, setTxs] = useState([]);
 
   useEffect(() => {
     const fetchTxs = async () => {
       setLoading(true);
+
       try {
-        const res = await axios.get("http://localhost:5000/api/tx");
+        const res = await axios.get("http://localhost:5000/api/tx/status");
+
         setTxs(res.data);
-      } catch {
-        console.log("Backend not running");
+      } catch (err) {
+        console.log("Backend unavailable");
       }
+
       setLoading(false);
     };
-    {
-      loading && <p className="text-xs text-gray-400">Fetching pool...</p>;
-    }
 
     fetchTxs();
+
     const interval = setInterval(fetchTxs, 3000);
 
     return () => clearInterval(interval);
@@ -32,10 +34,10 @@ export default function TxStatus() {
     <div>
       <h3 className="text-sm text-gray-300 mb-2">Transaction Pool</h3>
 
-      {txs.length === 0 && (
-        <p className="text-xs text-gray-400">
-          No private transactions yet — send one 👀
-        </p>
+      {loading && <p className="text-xs text-gray-400">Fetching pool...</p>}
+
+      {!loading && txs.length === 0 && (
+        <p className="text-xs text-gray-400">No private transactions yet 👀</p>
       )}
 
       {txs.map((tx: any, i) => (
