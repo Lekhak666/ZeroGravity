@@ -3,6 +3,8 @@ import commitHash from "../services/agent.service.js";
 
 import { buildManagedCommit } from "../services/managedCommit.service.js";
 
+import { saveReveal } from "../services/revealStore.service.js";
+
 export default async function handleAgent(req, res) {
   try {
     const { prompt } = req.body;
@@ -17,6 +19,8 @@ export default async function handleAgent(req, res) {
       buildManagedCommit(parsed);
 
     const result = await commitHash(generatedHash);
+
+    saveReveal(generatedHash, revealData);
 
     console.log("PROMPT:", prompt);
 

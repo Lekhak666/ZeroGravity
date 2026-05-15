@@ -1,22 +1,49 @@
 "use client";
 
+import { useState } from "react";
+import axios from "axios";
+import { useWalletClient } from "wagmi";
 import { revealCommit } from "../utils/reveal";
 
 export default function RevealButton() {
+  const { data: walletClient } = useWalletClient();
+  const [revealing, setRevealing] = useState(false);
+
   async function handleReveal() {
-    const keys = Object.keys(localStorage);
+    if (revealing) return;
 
-    const commitKey = keys.find((k) => k.startsWith("0x"));
-
-    if (!commitKey) {
-      alert("No such commit found");
+    if (!walletClient) {
+      alert("Connect wallet first");
       return;
     }
 
-    const data = JSON.parse(localStorage.getItem(commitKey) || "{}");
+    setRevealing(true);
 
     try {
+      let data;
+
+      const managed = localStorage.getItem("managedCommit");
+
+      if (managed) {
+        const res = await axios.get(
+          `http://localhost:5000/api/agent/reveal/${managed}`,
+        );
+
+        data = res.data;
+      } else {
+        const key = localStorage.getItem("latestCommit");
+
+        if (!key) {
+          alert("No commit found");
+          setRevealing(false);
+          return;
+        }
+
+        data = JSON.parse(localStorage.getItem(key) || "{}");
+      }
+
       const txHash = await revealCommit(
+        walletClient,
         data.to,
         data.amount,
         data.nonce,
@@ -26,16 +53,19 @@ export default function RevealButton() {
       alert(`Revealed: ${txHash}`);
     } catch (err) {
       console.error(err);
-      alert("Reveal failed (was it too early?)");
+      alert("Reveal failed");
+    } finally {
+      setRevealing(false);
     }
   }
 
   return (
     <button
       onClick={handleReveal}
-      className="w-full py-2 rounded-lg bg-green-600"
+      disabled={revealing}
+      className="w-full py-2 rounded-lg bg-green-600 disabled:opacity-50"
     >
-      Reveal Commitment
+      {revealing ? "Revealing..." : "Reveal Commitment"}
     </button>
   );
 }
